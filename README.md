@@ -1,38 +1,30 @@
+# Enterprise System Architecture 2025
+
+## 1. Жобаны басқару (Project Management)
+* **Әдістеме:** Scrum Framework
+* **Бақылау құралы:** GitHub Projects
+* **Күйі:** Тапсырмалар орындалды (Done)
+
+## 2. Технологиялық шешімдер
+* **Frontend:** Vue.js
+* **Backend:** Node.js (TypeScript)
+* **Деректер қоры:** MongoDB
+* **Контейнерлеу:** Docker
+* **Оркестрация:** Kubernetes (K8s)
+
+## 3. Жүйенің архитектуралық схемасы
+```mermaid
 graph TD
-    subgraph Client Tier
-        User((Пайдаланушы))
+    Client((Клиент)) --> WebApp[Vue.js Web App]
+    WebApp --> Gateway[API Gateway]
+    Gateway --> Auth[Auth Service]
+    Gateway --> Core[Core Node.js API]
+    Core --> NoSQL[(MongoDB)]
+    
+    subgraph "Infrastructure"
+        Docker[Docker Containers]
+        K8s[Kubernetes Cluster]
     end
     
-    subgraph AWS VPC
-        direction LR
-        
-        % 1. Frontend: Static Content
-        User --> CloudFront[AWS CloudFront: CDN]
-        CloudFront --> S3[S3 Bucket: Static React Files]
-        
-        % 2. Backend: Dynamic Content
-        CloudFront --> ALB[Application Load Balancer (ALB)]
-        
-        ALB --> ASG[Auto Scaling Group (ASG)]
-        ASG --> EC2_1[EC2/Flask App 1]
-        ASG --> EC2_2[EC2/Flask App 2]
-        
-        % 3. Database Layer
-        EC2_1 --> RDS[AWS RDS: PostgreSQL Managed DB]
-        EC2_2 --> RDS
-        
-        % 4. Monitoring (Cross-VPC)
-        EC2_1 -.-> Prom[Prometheus Server: Metrics Collection]
-        EC2_2 -.-> Prom
-        Prom --> Grafana[Grafana: Visualization]
-    end
-    
-    style User fill:#007bff,color:#fff
-    style Prom fill:#ffcc00
-    style Grafana fill:#34a853,color:#fff
-    
-    % Легенда
-    subgraph Data Flow Legend
-        RDS -.-> Backups[S3: Snapshots]
-        Prom -.-> Alert[Alert Manager]
-    end
+    Core --- Docker
+    Docker --- K8s
